@@ -5,9 +5,9 @@
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Doena Soft.")]
 [assembly: AssemblyProduct("DVD Inventory")]
-[assembly: AssemblyCopyright("Copyright © Doena Soft. 2010 - 2015")]
+[assembly: AssemblyCopyright("Copyright © Doena Soft. 2010 - 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-[assembly: AssemblyVersion("3.0.1.0")]
-[assembly: AssemblyFileVersion("3.0.1.0")]
+[assembly: AssemblyVersion("3.0.1.1")]
+[assembly: AssemblyFileVersion("3.0.1.1")]

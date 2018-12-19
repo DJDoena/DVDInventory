@@ -1,12 +1,12 @@
-﻿using DoenaSoft.DVDProfiler.DVDProfilerHelper;
-using DoenaSoft.DVDProfiler.DVDProfilerXML.Version390;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using DoenaSoft.DVDProfiler.DVDProfilerHelper;
+using DoenaSoft.DVDProfiler.DVDProfilerXML.Version390;
 
 namespace DoenaSoft.DVDProfiler.DVDInventory
 {
@@ -20,15 +20,15 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         public MainForm(Boolean skipVersionCheck)
         {
-            this.SkipVersionCheck = skipVersionCheck;
-            this.CollectionList = new Dictionary<String, List<String>>();
-            this.RemovedIds = new Dictionary<String, Boolean>();
+            SkipVersionCheck = skipVersionCheck;
+            CollectionList = new Dictionary<String, List<String>>();
+            RemovedIds = new Dictionary<String, Boolean>();
             InitializeComponent();
         }
 
         private void OnOpenCollectionXMLToolStripMenuItemClick(Object sender, EventArgs e)
         {
-            this.OpenXmlFile("Collection");
+            OpenXmlFile("Collection");
         }
 
         private void OpenXmlFile(String fileName
@@ -49,7 +49,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                 {
                     Boolean onlyParents;
 
-                    if(MessageBox.Show(MessageBoxTexts.ImportOnlyParents, String.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+                    if (MessageBox.Show(MessageBoxTexts.ImportOnlyParents, String.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Question)
                         == DialogResult.Yes)
                     {
                         onlyParents = true;
@@ -59,14 +59,14 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                         onlyParents = false;
                     }
 
-                    this.Cursor = Cursors.WaitCursor;
-                    this.UPCDataGridView.SuspendLayout();
-                    this.ManualDiscIdDataGridView.SuspendLayout();
-                    this.SuspendLayout();
-                    this.UPCTextBox.Text = String.Empty;
-                    this.UPCDataGridView.Rows.Clear();
-                    this.ManualDiscIdDataGridView.Rows.Clear();
-                    this.CollectionList = new Dictionary<String, List<String>>();
+                    Cursor = Cursors.WaitCursor;
+                    UPCDataGridView.SuspendLayout();
+                    ManualDiscIdDataGridView.SuspendLayout();
+                    SuspendLayout();
+                    UPCTextBox.Text = String.Empty;
+                    UPCDataGridView.Rows.Clear();
+                    ManualDiscIdDataGridView.Rows.Clear();
+                    CollectionList = new Dictionary<String, List<String>>();
                     try
                     {
                         Collection collection;
@@ -89,11 +89,11 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                                 }
 
                                 row = CreateRow();
-                                if (this.CollectionList.ContainsKey(dvd.ID_Base) == false)
+                                if (CollectionList.ContainsKey(dvd.ID_Base) == false)
                                 {
-                                    this.CollectionList.Add(dvd.ID_Base, new List<String>(1));
+                                    CollectionList.Add(dvd.ID_Base, new List<String>(1));
                                 }
-                                this.CollectionList[dvd.ID_Base].Add(GetProfileId(dvd));
+                                CollectionList[dvd.ID_Base].Add(GetProfileId(dvd));
                                 if (dvd.ID_Type != DVDID_Type.UPCEAN)
                                 {
                                     manualDiscIdRows.Add(row);
@@ -119,14 +119,14 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                                     row.Cells[7].Value = String.Empty;
                                 }
                             }
-                            this.UPCDataGridView.Rows.AddRange(upcRows.ToArray());
-                            this.ManualDiscIdDataGridView.Rows.AddRange(manualDiscIdRows.ToArray());
+                            UPCDataGridView.Rows.AddRange(upcRows.ToArray());
+                            ManualDiscIdDataGridView.Rows.AddRange(manualDiscIdRows.ToArray());
                         }
-                        this.UPCDataGridView.Sort(this.UPCDataGridView.Columns["SortTitle"]
+                        UPCDataGridView.Sort(UPCDataGridView.Columns["SortTitle"]
                             , ListSortDirection.Ascending);
-                        this.ManualDiscIdDataGridView.Sort(this.ManualDiscIdDataGridView.Columns["SortTitle"]
+                        ManualDiscIdDataGridView.Sort(ManualDiscIdDataGridView.Columns["SortTitle"]
                             , ListSortDirection.Ascending);
-                        this.UPCTextBox.Focus();
+                        UPCTextBox.Focus();
                     }
                     catch (Exception ex)
                     {
@@ -135,10 +135,10 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                     }
                     finally
                     {
-                        this.UPCDataGridView.ResumeLayout();
-                        this.ManualDiscIdDataGridView.ResumeLayout();
-                        this.ResumeLayout();
-                        this.Cursor = Cursors.Default;
+                        UPCDataGridView.ResumeLayout();
+                        ManualDiscIdDataGridView.ResumeLayout();
+                        ResumeLayout();
+                        Cursor = Cursors.Default;
                     }
                 }
             }
@@ -146,19 +146,48 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private static string GetProfileId(DVD dvd)
         {
-            String profileId;
+            var profileId = dvd.UPC;
+            var locality = dvd.ID_LocalityDesc;
+            var variant = dvd.ID_VariantNum > 0 ? dvd.ID_VariantNum.ToString() : null;
+            var edition = dvd.Edition;
+            var title = dvd.Title;
 
-            profileId = dvd.UPC;
-            if (String.IsNullOrEmpty(dvd.ID_LocalityDesc) == false)
+            GetProfileId(ref profileId, locality, variant, title, edition);
+
+            return profileId;
+        }
+
+        private string GetProfileId(DataGridViewRow row)
+        {
+            var profileId = row.Cells["UPC"].Value.ToString();
+            var locality = row.Cells["Locality"].Value.ToString();
+            var variant = row.Cells["Variant"].Value.ToString();
+            var edition = row.Cells["Edition"].Value.ToString();
+            var title = row.Cells["Title"].Value.ToString();
+
+            GetProfileId(ref profileId, locality, variant, title, edition);
+
+            return profileId;
+        }
+
+        private static void GetProfileId(ref string profileId, string locality, string variant, string title, string edition)
+        {
+            if (string.IsNullOrEmpty(locality) == false)
             {
-                profileId += " (" + dvd.ID_LocalityDesc + ")";
-            }
-            if (dvd.ID_VariantNum > 0)
-            {
-                profileId += " #" + dvd.ID_VariantNum;
+                profileId += " (" + locality + ")";
             }
 
-            return (profileId);
+            if (string.IsNullOrEmpty(variant) == false)
+            {
+                profileId += " #" + variant;
+            }
+
+            profileId += " \"" + title + "\"";
+
+            if (string.IsNullOrEmpty(edition) == false)
+            {
+                profileId += " (" + edition + ")";
+            }
         }
 
         private static Boolean HasParent(DVD dvd)
@@ -216,7 +245,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private void OnSaveInventoryXMLToolStripMenuItemClick(Object sender, EventArgs e)
         {
-            this.SaveInventoryXml();
+            SaveInventoryXml();
         }
 
         private DialogResult SaveInventoryXml()
@@ -256,10 +285,10 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
             Collection collection;
             List<DVD> dvds;
 
-            dvds = new List<DVD>(this.UPCDataGridView.Rows.Count
-                + this.ManualDiscIdDataGridView.Rows.Count);
-            CreateInventoryRows(dvds, this.UPCDataGridView);
-            CreateInventoryRows(dvds, this.ManualDiscIdDataGridView);
+            dvds = new List<DVD>(UPCDataGridView.Rows.Count
+                + ManualDiscIdDataGridView.Rows.Count);
+            CreateInventoryRows(dvds, UPCDataGridView);
+            CreateInventoryRows(dvds, ManualDiscIdDataGridView);
             collection = new Collection();
             collection.DVDList = dvds.ToArray();
             try
@@ -276,7 +305,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                 }
                 result = DialogResult.Abort;
             }
-            
+
             return result;
         }
 
@@ -330,12 +359,12 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private void OnReadMeToolStripMenuItemClick(Object sender, EventArgs e)
         {
-            this.OpenReadme();
+            OpenReadme();
         }
 
         private void OnAboutDVDInventoryToolStripMenuItemClick(Object sender, EventArgs e)
         {
-            using (AboutBox aboutBox = new AboutBox(this.GetType().Assembly))
+            using (AboutBox aboutBox = new AboutBox(GetType().Assembly))
             {
                 aboutBox.ShowDialog();
             }
@@ -343,14 +372,14 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private void OnMainFormLoad(Object sender, EventArgs e)
         {
-            this.SuspendLayout();
-            this.LayoutForm();
-            AddColumns(this.UPCDataGridView);
-            AddColumns(this.ManualDiscIdDataGridView);
-            this.ResumeLayout();
+            SuspendLayout();
+            LayoutForm();
+            AddColumns(UPCDataGridView);
+            AddColumns(ManualDiscIdDataGridView);
+            ResumeLayout();
             if (Program.Settings.CurrentVersion != Assembly.GetExecutingAssembly().GetName().Version.ToString())
             {
-                this.OpenReadme();
+                OpenReadme();
                 Program.Settings.CurrentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             }
         }
@@ -409,7 +438,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
             if (skipVersionCheck == false)
             {
                 OnlineAccess.Init("Doena Soft.", "DVDInventory");
-                OnlineAccess.CheckForNewVersion("http://doena-soft.de/dvdprofiler/3.9.0/versions.xml", this, "DVDInventory", this.GetType().Assembly);
+                OnlineAccess.CheckForNewVersion("http://doena-soft.de/dvdprofiler/3.9.0/versions.xml", this, "DVDInventory", GetType().Assembly);
             }
         }
 
@@ -417,49 +446,49 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
         {
             if (Program.Settings.MainForm.WindowState == FormWindowState.Normal)
             {
-                this.Left = Program.Settings.MainForm.Left;
-                this.Top = Program.Settings.MainForm.Top;
-                if (Program.Settings.MainForm.Width > this.MinimumSize.Width)
+                Left = Program.Settings.MainForm.Left;
+                Top = Program.Settings.MainForm.Top;
+                if (Program.Settings.MainForm.Width > MinimumSize.Width)
                 {
-                    this.Width = Program.Settings.MainForm.Width;
+                    Width = Program.Settings.MainForm.Width;
                 }
                 else
                 {
-                    this.Width = this.MinimumSize.Width;
+                    Width = MinimumSize.Width;
                 }
-                if (Program.Settings.MainForm.Height > this.MinimumSize.Height)
+                if (Program.Settings.MainForm.Height > MinimumSize.Height)
                 {
-                    this.Height = Program.Settings.MainForm.Height;
+                    Height = Program.Settings.MainForm.Height;
                 }
                 else
                 {
-                    this.Height = this.MinimumSize.Height;
+                    Height = MinimumSize.Height;
                 }
             }
             else
             {
-                this.Left = Program.Settings.MainForm.RestoreBounds.X;
-                this.Top = Program.Settings.MainForm.RestoreBounds.Y;
-                if (Program.Settings.MainForm.RestoreBounds.Width > this.MinimumSize.Width)
+                Left = Program.Settings.MainForm.RestoreBounds.X;
+                Top = Program.Settings.MainForm.RestoreBounds.Y;
+                if (Program.Settings.MainForm.RestoreBounds.Width > MinimumSize.Width)
                 {
-                    this.Width = Program.Settings.MainForm.RestoreBounds.Width;
+                    Width = Program.Settings.MainForm.RestoreBounds.Width;
                 }
                 else
                 {
-                    this.Width = this.MinimumSize.Width;
+                    Width = MinimumSize.Width;
                 }
-                if (Program.Settings.MainForm.RestoreBounds.Height > this.MinimumSize.Height)
+                if (Program.Settings.MainForm.RestoreBounds.Height > MinimumSize.Height)
                 {
-                    this.Height = Program.Settings.MainForm.RestoreBounds.Height;
+                    Height = Program.Settings.MainForm.RestoreBounds.Height;
                 }
                 else
                 {
-                    this.Height = this.MinimumSize.Height;
+                    Height = MinimumSize.Height;
                 }
             }
             if (Program.Settings.MainForm.WindowState != FormWindowState.Minimized)
             {
-                this.WindowState = Program.Settings.MainForm.WindowState;
+                WindowState = Program.Settings.MainForm.WindowState;
             }
         }
 
@@ -477,14 +506,13 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private void OnRemoveProfileByUpcButtonClick(Object sender, EventArgs e)
         {
-            this.RemoveUPC(true);
+            RemoveUPC(true);
         }
 
         private void RemoveUPC(Boolean withErrorMessage)
         {
-            Boolean temp;
 
-            this.RemoveById(withErrorMessage, this.UPCTextBox.Text, false, out temp, out temp);
+            RemoveById(withErrorMessage, UPCTextBox.Text, false, out bool temp, out temp);
         }
 
         private void RemoveById(Boolean withErrorMessage, String id, Boolean autoInput, out Boolean success, out Boolean cancel)
@@ -494,7 +522,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
             success = true;
             cancel = false;
-            if (this.CollectionList.ContainsKey(id))
+            if (CollectionList.ContainsKey(id))
             {
                 success = RemoveUPC(id, autoInput);
                 return;
@@ -502,7 +530,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
             if ((id.StartsWith("I") == false) && (id.StartsWith("M") == false))
             {
                 alternateUpc = "0" + id;
-                if ((id.Length == 12) && (this.CollectionList.ContainsKey(alternateUpc)))
+                if ((id.Length == 12) && (CollectionList.ContainsKey(alternateUpc)))
                 {
                     success = RemoveUPC(alternateUpc, autoInput);
                     return;
@@ -515,19 +543,19 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
             if (withErrorMessage)
             {
                 errorText = String.Format("{0} {1} could not be found in List!", DetermineIdType(id), id);
-                if ((this.RemovedIds.ContainsKey(id) == false) && (this.RemovedIds.ContainsKey(alternateUpc) == false))
+                if ((RemovedIds.ContainsKey(id) == false) && (RemovedIds.ContainsKey(alternateUpc) == false))
                 {
                     AddLog(errorText);
-                    this.RemovedIds.Add(id, false);
+                    RemovedIds.Add(id, false);
                 }
                 else
                 {
-                    if ((this.RemovedIds.ContainsKey(id)) && (this.RemovedIds[id] == true))
+                    if ((RemovedIds.ContainsKey(id)) && (RemovedIds[id] == true))
                     {
                         errorText = String.Format("{0} {1} has been removed already!", DetermineIdType(id), id);
                         AddLog(errorText);
                     }
-                    else if ((this.RemovedIds.ContainsKey(alternateUpc)) && (this.RemovedIds[alternateUpc] == true))
+                    else if ((RemovedIds.ContainsKey(alternateUpc)) && (RemovedIds[alternateUpc] == true))
                     {
                         errorText = String.Format("{0} {1} has been removed already!", DetermineIdType(id), id); ;
                         AddLog(errorText);
@@ -552,30 +580,30 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                 }
                 if (autoInput == false)
                 {
-                    this.UPCTextBox.SelectAll();
-                    this.UPCTextBox.Focus();
+                    UPCTextBox.SelectAll();
+                    UPCTextBox.Focus();
                 }
             }
             else
             {
-                if ((this.RemovedIds.ContainsKey(id)) && (this.RemovedIds[id] == true))
+                if ((RemovedIds.ContainsKey(id)) && (RemovedIds[id] == true))
                 {
                     errorText = String.Format("{0} {1} has been removed already!", DetermineIdType(id), id); ;
                     AddLog(errorText);
                     if (autoInput == false)
                     {
-                        this.UPCTextBox.SelectAll();
-                        this.UPCTextBox.Focus();
+                        UPCTextBox.SelectAll();
+                        UPCTextBox.Focus();
                     }
                 }
-                else if ((this.RemovedIds.ContainsKey(alternateUpc)) && (this.RemovedIds[alternateUpc] == true))
+                else if ((RemovedIds.ContainsKey(alternateUpc)) && (RemovedIds[alternateUpc] == true))
                 {
                     errorText = String.Format("{0} {1} has been removed already!", DetermineIdType(id), id); ;
                     AddLog(errorText);
                     if (autoInput == false)
                     {
-                        this.UPCTextBox.SelectAll();
-                        this.UPCTextBox.Focus();
+                        UPCTextBox.SelectAll();
+                        UPCTextBox.Focus();
                     }
                 }
             }
@@ -586,7 +614,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
             String fileName;
 
             text += Environment.NewLine + Environment.NewLine;
-            this.LogTextbox.Text += text;
+            LogTextbox.Text += text;
 
             fileName = GetLogFileName();
 
@@ -615,8 +643,8 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private static String DetermineIdType(String id)
         {
-            switch(id[0])
-            {                
+            switch (id[0])
+            {
                 case ('I'):
                     {
                         return ("Disc ID");
@@ -642,11 +670,11 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
             if ((upc.StartsWith("I")) || (upc.StartsWith("M")))
             {
-                dataGrid = this.ManualDiscIdDataGridView;
+                dataGrid = ManualDiscIdDataGridView;
             }
             else
             {
-                dataGrid = this.UPCDataGridView;
+                dataGrid = UPCDataGridView;
             }
             for (Int32 i = dataGrid.Rows.Count - 1; i >= 0; i--)
             {
@@ -656,15 +684,15 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                 row = dataGrid.Rows[i];
                 dvd = (DVD)(row.Tag);
                 if (dvd.ID_Base == upc)
-                {             
+                {
 
-                    if (this.CollectionList[upc].Count == 1)
+                    if (CollectionList[upc].Count == 1)
                     {
                         dataGrid.Rows.RemoveAt(i);
                         RemoveIdFromCollectionList(dvd);
                         if (autoInput == false)
                         {
-                            this.UPCTextBox.Text = String.Empty;
+                            UPCTextBox.Text = String.Empty;
                             System.Media.SystemSounds.Asterisk.Play();
                         }
                         return (true);
@@ -686,13 +714,13 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                             String extId;
 
                             extId = GetProfileId(row);
-                            dataGrid.Rows.RemoveAt(i);                            
-                            this.CollectionList[upc].Remove(extId);
+                            dataGrid.Rows.RemoveAt(i);
+                            CollectionList[upc].Remove(extId);
                             AddLog(String.Format("Successfully removed {0}", extId));
                             SaveTempFile();
                             if (autoInput == false)
                             {
-                                this.UPCTextBox.Text = String.Empty;
+                                UPCTextBox.Text = String.Empty;
                             }
                             return (true);
                         }
@@ -701,42 +729,19 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
             }
             if (autoInput == false)
             {
-                this.UPCTextBox.SelectAll();
-                this.UPCTextBox.Focus();
+                UPCTextBox.SelectAll();
+                UPCTextBox.Focus();
             }
             return (true);
         }
 
-        private string GetProfileId(DataGridViewRow row)
-        {
-            String profileId;
-            String variant;
-            String locality;
-
-            profileId = row.Cells["UPC"].Value.ToString();
-
-            locality = row.Cells["Locality"].Value.ToString();
-            if (String.IsNullOrEmpty(locality) == false)
-            {
-                profileId += " (" + locality + ")";
-            }
-
-            variant = row.Cells["Variant"].Value.ToString();
-            if (String.IsNullOrEmpty(variant) == false)
-            {
-                profileId += " #" + variant;
-            }
-
-            return (profileId);
-        }
-
         private void RemoveIdFromCollectionList(DVD dvd)
         {
-            this.CollectionList.Remove(dvd.ID_Base);
+            CollectionList.Remove(dvd.ID_Base);
             AddLog(String.Format("Successfully removed {0}", GetProfileId(dvd)));
-            if (this.RemovedIds.ContainsKey(dvd.ID_Base) == false)
+            if (RemovedIds.ContainsKey(dvd.ID_Base) == false)
             {
-                this.RemovedIds.Add(dvd.ID_Base, true);
+                RemovedIds.Add(dvd.ID_Base, true);
             }
             SaveTempFile();
         }
@@ -754,7 +759,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
         {
             String fileName;
             String path;
-        
+
             path = GetDocumentsFolder();
 
             fileName = "Inventory.tmp.xml";
@@ -766,41 +771,41 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private void OnUPCTextBoxTextChanged(Object sender, EventArgs e)
         {
-            if (this.UPCTextBox.Text.Length == 12)
+            if (UPCTextBox.Text.Length == 12)
             {
-                this.RemoveUPC(false);
+                RemoveUPC(false);
             }
-            else if (this.UPCTextBox.Text.Length == 13)
+            else if (UPCTextBox.Text.Length == 13)
             {
-                this.RemoveUPC(true);
+                RemoveUPC(true);
             }
         }
 
         private void OnMainFormClosing(Object sender, FormClosingEventArgs e)
         {
-            if ((this.UPCDataGridView.RowCount > 0) || (this.ManualDiscIdDataGridView.RowCount > 0))
+            if ((UPCDataGridView.RowCount > 0) || (ManualDiscIdDataGridView.RowCount > 0))
             {
                 if (MessageBox.Show("Save Inventory XML?", "Save XML?", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
                     == DialogResult.Yes)
                 {
-                    if (this.SaveInventoryXml() != DialogResult.OK)
+                    if (SaveInventoryXml() != DialogResult.OK)
                     {
                         e.Cancel = true;
                         return;
                     }
                 }
             }
-            Program.Settings.MainForm.Left = this.Left;
-            Program.Settings.MainForm.Top = this.Top;
-            Program.Settings.MainForm.Width = this.Width;
-            Program.Settings.MainForm.Height = this.Height;
-            Program.Settings.MainForm.WindowState = this.WindowState;
-            Program.Settings.MainForm.RestoreBounds = this.RestoreBounds;
+            Program.Settings.MainForm.Left = Left;
+            Program.Settings.MainForm.Top = Top;
+            Program.Settings.MainForm.Width = Width;
+            Program.Settings.MainForm.Height = Height;
+            Program.Settings.MainForm.WindowState = WindowState;
+            Program.Settings.MainForm.RestoreBounds = RestoreBounds;
         }
 
         private void OnUPCDataGridViewUserDeletingRow(Object sender, DataGridViewRowCancelEventArgs e)
         {
-            this.RemoveRow(e.Row);
+            RemoveRow(e.Row);
         }
 
         private void RemoveRow(DataGridViewRow row)
@@ -808,12 +813,12 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
             DVD dvd;
 
             dvd = (DVD)(row.Tag);
-            if (this.CollectionList[dvd.ID_Base].Count > 1)
+            if (CollectionList[dvd.ID_Base].Count > 1)
             {
                 String extId;
 
                 extId = GetProfileId(row);
-                this.CollectionList[dvd.ID_Base].Remove(extId);
+                CollectionList[dvd.ID_Base].Remove(extId);
                 AddLog(String.Format("Successfully removed {0}", extId));
                 SaveTempFile();
             }
@@ -825,7 +830,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private void OnRemoveSelectedUpcRowProfileButtonClick(Object sender, EventArgs e)
         {
-            RemoveSelectedRow(this.UPCDataGridView);
+            RemoveSelectedRow(UPCDataGridView);
         }
 
         private void RemoveSelectedRow(DataGridView dataGrid)
@@ -836,7 +841,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
             if (rows.Count > 0)
             {
-                this.RemoveRow(rows[0]);
+                RemoveRow(rows[0]);
                 dataGrid.Rows.RemoveAt(rows[0].Index);
             }
         }
@@ -854,15 +859,15 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                 {
                     List<String> ids;
 
-                    ids = new List<String>(this.UPCDataGridView.Rows.Count + this.ManualDiscIdDataGridView.Rows.Count);
-                    foreach (DataGridViewRow row in this.UPCDataGridView.Rows)
+                    ids = new List<String>(UPCDataGridView.Rows.Count + ManualDiscIdDataGridView.Rows.Count);
+                    foreach (DataGridViewRow row in UPCDataGridView.Rows)
                     {
                         DVD dvd;
 
                         dvd = (DVD)(row.Tag);
                         ids.Add(dvd.ID);
                     }
-                    foreach (DataGridViewRow row in this.ManualDiscIdDataGridView.Rows)
+                    foreach (DataGridViewRow row in ManualDiscIdDataGridView.Rows)
                     {
                         DVD dvd;
 
@@ -913,10 +918,8 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                                     line = sr.ReadLine().Trim();
                                     if (String.IsNullOrEmpty(line) == false)
                                     {
-                                        Boolean success;
-                                        Boolean temp;
 
-                                        this.RemoveById(true, line, true, out success, out temp);
+                                        RemoveById(true, line, true, out bool success, out bool temp);
                                         if (success == false)
                                         {
                                             return;
@@ -937,7 +940,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private void OnManualDiscIdDataGridViewUserDeletingRow(Object sender, DataGridViewRowCancelEventArgs e)
         {
-            this.RemoveRow(e.Row);
+            RemoveRow(e.Row);
         }
 
         private void OnImportDiscIdListToolStripMenuItemClick(Object sender, EventArgs e)
@@ -957,15 +960,13 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                                 while (sr.EndOfStream == false)
                                 {
                                     String discId;
-                                    Boolean success;
-                                    Boolean temp;
 
                                     discId = sr.ReadLine().Trim();
                                     if (discId.StartsWith("I") == false)
                                     {
                                         discId = "I" + discId;
                                     }
-                                    this.RemoveById(true, discId, true, out success, out temp);
+                                    RemoveById(true, discId, true, out bool success, out bool temp);
                                     if (success == false)
                                     {
                                         return;
@@ -985,7 +986,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private void OnCheckForUpdateToolStripMenuItemClick(Object sender, EventArgs e)
         {
-            this.CheckForNewVersion(false);
+            CheckForNewVersion(false);
         }
 
         private void OnProcessListButtonClick(Object sender, EventArgs e)
@@ -996,7 +997,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
             Cursor = Cursors.WaitCursor;
             ids = new List<String>(50);
-            split = this.MassUpcTextBox.Text.Split('\n');
+            split = MassUpcTextBox.Text.Split('\n');
             for (Int32 i = split.Length - 1; i >= 0; i--)
             {
                 String line;
@@ -1009,10 +1010,8 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
             }
             for (Int32 i = ids.Count - 1; i >= 0; i--)
             {
-                Boolean success;
-                Boolean cancel;
 
-                this.RemoveById(true, ids[i], true, out success, out cancel);
+                RemoveById(true, ids[i], true, out bool success, out bool cancel);
                 if (cancel)
                 {
                     break;
@@ -1027,26 +1026,26 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
             {
                 temp.AppendLine(ids[i]);
             }
-            this.MassUpcTextBox.Text = temp.ToString();
+            MassUpcTextBox.Text = temp.ToString();
             Cursor = Cursors.Default;
-            this.MassUpcTextBox.Focus();
+            MassUpcTextBox.Focus();
         }
 
         private void OnTabControlSelectedIndexChanged(Object sender, EventArgs e)
         {
-            if(TabControl.SelectedIndex ==0)
+            if (TabControl.SelectedIndex == 0)
             {
-                this.UPCTextBox.Focus();
+                UPCTextBox.Focus();
             }
-            else if(TabControl.SelectedIndex == 1)
+            else if (TabControl.SelectedIndex == 1)
             {
-                this.MassUpcTextBox.Focus();
+                MassUpcTextBox.Focus();
             }
         }
 
         private void OnRemoveSelectedManualRowButtonClick(Object sender, EventArgs e)
         {
-            RemoveSelectedRow(this.ManualDiscIdDataGridView);
+            RemoveSelectedRow(ManualDiscIdDataGridView);
         }
     }
 }
