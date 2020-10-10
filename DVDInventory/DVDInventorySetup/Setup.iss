@@ -1,11 +1,11 @@
 [Setup]
 AppName=DVD Inventory
 AppId=DVDInventory
-AppVerName=DVD Inventory 3.0.1.1
-AppCopyright=Copyright © Doena Soft. 2010 - 2018
+AppVerName=DVD Inventory 3.0.1.2
+AppCopyright=Copyright © Doena Soft. 2010 - 2020
 AppPublisher=Doena Soft.
 AppPublisherURL=http://doena-journal.net/en/dvd-profiler-tools/
-DefaultDirName={pf32}\Doena Soft.\DVD Inventory
+DefaultDirName={commonpf32}\Doena Soft.\DVD Inventory
 DefaultGroupName=DVD Inventory
 DirExistsWarning=No
 SourceDir=..\DVDInventory\bin\x86\DVDInventory
@@ -13,16 +13,16 @@ Compression=zip/9
 AppMutex=InvelosDVDPro
 OutputBaseFilename=DVDInventorySetup
 OutputDir=..\..\..\..\DVDInventorySetup\Setup\DVDInventory
-MinVersion=0,5.1
+MinVersion=0,6.0
 PrivilegesRequired=admin
 WizardImageFile=compiler:wizmodernimage-is.bmp
 WizardSmallImageFile=compiler:wizmodernsmallimage-is.bmp
 DisableReadyPage=yes
 ShowLanguageDialog=no
 VersionInfoCompany=Doena Soft.
-VersionInfoCopyright=2010 - 2018
+VersionInfoCopyright=2010 - 2020
 VersionInfoDescription=DVD Inventory Setup
-VersionInfoVersion=3.0.1.1
+VersionInfoVersion=3.0.1.2
 UninstallDisplayIcon={app}\djdsoft.ico
 
 [Languages]

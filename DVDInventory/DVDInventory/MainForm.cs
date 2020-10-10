@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using DoenaSoft.DVDProfiler.DVDProfilerHelper;
-using DoenaSoft.DVDProfiler.DVDProfilerXML.Version390;
+using DoenaSoft.DVDProfiler.DVDProfilerXML.Version400;
 
 namespace DoenaSoft.DVDProfiler.DVDInventory
 {
@@ -71,7 +71,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                     {
                         Collection collection;
 
-                        collection = Serializer<Collection>.Deserialize(ofd.FileName);
+                        collection = DVDProfilerSerializer<Collection>.Deserialize(ofd.FileName);
                         if ((collection != null) && (collection.DVDList != null) && (collection.DVDList.Length > 0))
                         {
                             List<DataGridViewRow> upcRows;

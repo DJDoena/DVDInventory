@@ -136,7 +136,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                         File.Delete(ErrorFile);
                     }
                     exceptionXml = new ExceptionXml(ex);
-                    Serializer<ExceptionXml>.Serialize(ErrorFile, exceptionXml);
+                    DVDProfilerSerializer<ExceptionXml>.Serialize(ErrorFile, exceptionXml);
                 }
                 catch(Exception inEx)
                 {
