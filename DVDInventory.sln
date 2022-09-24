@@ -1,18 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Libraries", "_Libraries", "{10DD7216-B34A-4CCA-A1E3-0632F54CE838}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{601FCC54-9771-46AD-A2A7-5D18A637D62E}"
 	ProjectSection(SolutionItems) = preProject
 		DVDInventory\DVDInventorySetup\Setup.iss = DVDInventory\DVDInventorySetup\Setup.iss
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVDProfilerHelper", "DVDProfilerXML\DVDProfilerHelper\DVDProfilerHelper\DVDProfilerHelper.csproj", "{461DACCA-8EBF-4C03-AD1A-C438E4EB3B36}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVDProfilerXML", "DVDProfilerXML\DVDProfilerXML\DVDProfilerXML.csproj", "{2E90CC6F-892E-45B3-8812-EE52FFA3B222}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVDInventory", "DVDInventory\DVDInventory\DVDInventory.csproj", "{095FC5D2-BE80-4787-A1BA-A5788CF83BBB}"
 EndProject
@@ -21,18 +15,13 @@ Global
 		Debug|x86 = Debug|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{461DACCA-8EBF-4C03-AD1A-C438E4EB3B36}.Debug|x86.ActiveCfg = Debug|x86
-		{461DACCA-8EBF-4C03-AD1A-C438E4EB3B36}.Debug|x86.Build.0 = Debug|x86
-		{2E90CC6F-892E-45B3-8812-EE52FFA3B222}.Debug|x86.ActiveCfg = Debug|x86
-		{2E90CC6F-892E-45B3-8812-EE52FFA3B222}.Debug|x86.Build.0 = Debug|x86
 		{095FC5D2-BE80-4787-A1BA-A5788CF83BBB}.Debug|x86.ActiveCfg = Debug|x86
 		{095FC5D2-BE80-4787-A1BA-A5788CF83BBB}.Debug|x86.Build.0 = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{461DACCA-8EBF-4C03-AD1A-C438E4EB3B36} = {10DD7216-B34A-4CCA-A1E3-0632F54CE838}
-		{2E90CC6F-892E-45B3-8812-EE52FFA3B222} = {10DD7216-B34A-4CCA-A1E3-0632F54CE838}
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {677EA566-01BB-4632-B541-B71ADD75464A}
 	EndGlobalSection
 EndGlobal

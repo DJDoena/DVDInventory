@@ -120,7 +120,7 @@
   <data name="CriticalError" xml:space="preserve">
     <value>{0}
 
-A log file was created under "{1}". Please send it to karsten@yajirobi.de.</value>
+A log file was created under "{1}". Please send it to profiler_plugins@doena-soft.de.de.</value>
   </data>
   <data name="CriticalErrorHeader" xml:space="preserve">
     <value>Critical Error!</value>
