@@ -1,10 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using System.IO;
-using System.Text;
-using DoenaSoft.DVDProfiler.DVDProfilerXML;
 using DoenaSoft.DVDProfiler.DVDProfilerHelper;
+using DoenaSoft.ToolBox.Generics;
 
 namespace DoenaSoft.DVDProfiler.DVDInventory
 {
@@ -20,7 +19,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private static readonly String ApplicationPath;
 
-        private static WindowHandle WindowHandle;
+        private static readonly WindowHandle WindowHandle;
 
         static Program()
         {
@@ -35,7 +34,7 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
         /// The main entry point for the application.
         /// </summary>
         [STAThread()]
-        static void Main(String[] args)
+        private static void Main(String[] args)
         {
             //System.Threading.Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
             //if((args != null) && (args.Length > 0))
@@ -58,21 +57,21 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
             {
                 MainForm mainForm;
 
-                if(Directory.Exists(ApplicationPath) == false)
+                if (Directory.Exists(ApplicationPath) == false)
                 {
                     Directory.CreateDirectory(ApplicationPath);
                 }
-                if(File.Exists(SettingsFile))
+                if (File.Exists(SettingsFile))
                 {
                     try
                     {
-                        using(FileStream fs = new FileStream(SettingsFile, FileMode.Open, FileAccess.Read
+                        using (FileStream fs = new FileStream(SettingsFile, FileMode.Open, FileAccess.Read
                             , FileShare.Read))
                         {
                             Settings = (Settings)(XmlSerializerSettings.Deserialize(fs));
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         MessageBox.Show(WindowHandle, String.Format(MessageBoxTexts.FileCantBeRead, SettingsFile, ex.Message)
                             , MessageBoxTexts.ErrorHeader, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -81,19 +80,19 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                 CreateSettings();
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                if((args != null) && (args.Length > 0))
+                if ((args != null) && (args.Length > 0))
                 {
-                    Boolean found;                  
+                    Boolean found;
 
                     found = false;
-                    for(Int32 i = 0; i < args.Length; i++)
+                    for (Int32 i = 0; i < args.Length; i++)
                     {
-                        if(args[i] == "/skipversioncheck")
+                        if (args[i] == "/skipversioncheck")
                         {
                             break;
                         }
                     }
-                    if(found)
+                    if (found)
                     {
                         mainForm = new MainForm(true);
                         Application.Run(mainForm);
@@ -111,19 +110,19 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
                 }
                 try
                 {
-                    using(FileStream fs = new FileStream(SettingsFile, FileMode.Create, FileAccess.Write
+                    using (FileStream fs = new FileStream(SettingsFile, FileMode.Create, FileAccess.Write
                            , FileShare.None))
                     {
                         XmlSerializerSettings.Serialize(fs, Settings);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show(WindowHandle, String.Format(MessageBoxTexts.FileCantBeWritten, SettingsFile, ex.Message)
                         , MessageBoxTexts.ErrorHeader, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 try
                 {
@@ -131,14 +130,14 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
                     MessageBox.Show(WindowHandle, String.Format(MessageBoxTexts.CriticalError, ex.Message, ErrorFile)
                         , MessageBoxTexts.CriticalErrorHeader, MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                    if(File.Exists(ErrorFile))
+                    if (File.Exists(ErrorFile))
                     {
                         File.Delete(ErrorFile);
                     }
                     exceptionXml = new ExceptionXml(ex);
-                    DVDProfilerSerializer<ExceptionXml>.Serialize(ErrorFile, exceptionXml);
+                    XmlSerializer<ExceptionXml>.Serialize(ErrorFile, exceptionXml);
                 }
-                catch(Exception inEx)
+                catch (Exception inEx)
                 {
                     MessageBox.Show(WindowHandle, String.Format(MessageBoxTexts.FileCantBeWritten, ErrorFile, inEx.Message), MessageBoxTexts.ErrorHeader
                         , MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -148,11 +147,11 @@ namespace DoenaSoft.DVDProfiler.DVDInventory
 
         private static void CreateSettings()
         {
-            if(Settings == null)
+            if (Settings == null)
             {
                 Settings = new Settings();
             }
-            if(Settings.MainForm == null)
+            if (Settings.MainForm == null)
             {
                 Settings.MainForm = new SizableForm();
             }

@@ -1,27 +1,27 @@
 [Setup]
 AppName=DVD Inventory
 AppId=DVDInventory
-AppVerName=DVD Inventory 3.0.1.2
-AppCopyright=Copyright © Doena Soft. 2010 - 2022
+AppVerName=DVD Inventory 3.0.2
+AppCopyright=Copyright © Doena Soft. 2010 - 2025
 AppPublisher=Doena Soft.
 AppPublisherURL=http://doena-journal.net/en/dvd-profiler-tools/
 DefaultDirName={commonpf32}\Doena Soft.\DVD Inventory
 DefaultGroupName=DVD Inventory
 DirExistsWarning=No
-SourceDir=..\DVDInventory\bin\x86\DVDInventory
+SourceDir=..\DVDInventory\bin\x64\Release\net472
 Compression=zip/9
 AppMutex=InvelosDVDPro
 OutputBaseFilename=DVDInventorySetup
-OutputDir=..\..\..\..\DVDInventorySetup\Setup\DVDInventory
+OutputDir=..\..\..\..\..\DVDInventorySetup\Setup\DVDInventory
 MinVersion=0,6.1sp1
 PrivilegesRequired=admin
 WizardStyle=modern
 DisableReadyPage=yes
 ShowLanguageDialog=no
 VersionInfoCompany=Doena Soft.
-VersionInfoCopyright=2010 - 2022
+VersionInfoCopyright=2010 - 2025
 VersionInfoDescription=DVD Inventory Setup
-VersionInfoVersion=3.0.1.2
+VersionInfoVersion=3.0.2
 UninstallDisplayIcon={app}\djdsoft.ico
 
 [Languages]
@@ -35,14 +35,18 @@ Name: "full"; Description: "Full installation"
 
 [Files]
 Source: "djdsoft.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "DoenaSoft.DVDProfilerHelper.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "DoenaSoft.DVDProfilerXML.dll"; DestDir: "{app}"; Flags: ignoreversion
+
+Source: "*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "*.pdb"; DestDir: "{app}"; Flags: ignoreversion
+
 Source: "DVDInventory.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "DVDInventory.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "DVDInventory.pdb"; DestDir: "{app}"; Flags: ignoreversion
 
-Source: "de\DoenaSoft.DVDProfilerHelper.resources.dll"; DestDir: "{app}\de"; Flags: ignoreversion
+Source: "de\*.dll"; DestDir: "{app}\de"; Flags: ignoreversion
 
 Source: "Readme\readme.html"; DestDir: "{app}\Readme"; Flags: ignoreversion
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
